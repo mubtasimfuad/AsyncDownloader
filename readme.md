@@ -57,8 +57,10 @@ Password: 123
 Username: admin
 Password: 123
 ```
-2. Click the "Download" button next to a file to download it asynchronously.
+2. Click the "Download" button next to all file to download them asynchronously.
 3. Once the download starts, a toast message will appear confirming that the download has started.
 4. To view your download list, click the "View Download List" button.
+5. Initially the staus of a download will be 'in progess', it will be changed to "Successful' upon the completition. 
+6. After Starting all the download one by after, In the download list you can examine the asynchrous download as it will be changing the statuses. 
 
 
