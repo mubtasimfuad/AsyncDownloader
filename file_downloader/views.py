@@ -7,6 +7,7 @@ from asgiref.sync import sync_to_async
 from django.db import IntegrityError
 from django.utils import timezone
 from django.http import JsonResponse
+
 @login_required
 
 def file_list(request):
@@ -29,8 +30,8 @@ async def download_file(request, pk):
         await sync_to_async(Download.objects.filter(file=file_obj).update)(
             downloaded_at=timezone.now()
         )
-        
-    async with aiohttp.ClientSession() as session:
+
+    async with aiohttp.ClientSession(trust_env = True) as session:
         async with session.get(url) as res:
             if res.status == 200:
                 content = await res.read()
@@ -53,7 +54,7 @@ async def download_file(request, pk):
 @login_required
 def download_list(request):
     downloads = Download.objects.filter(user=request.user).order_by('-downloaded_at')
-    return render(request, 'file_downloader/download_list.html', {'downloads': downloads.exclude(status='Successful')})
+    return render(request, 'file_downloader/download_list.html', {'downloads': downloads})
 
 
 def download_status(request, pk):
