@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+  <h1>Available Files</h1>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Preview</th>
+        <th>Download</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for file in files %}
+      <tr>
+        <td>{{ file.name }}</td>
+        {% if file.url|lower|slice:'-4:' == '.png' or file.url|lower|slice:'-4:' == '.jpg' or file.url|lower|slice:'-5:' == '.jpeg' %}
+        <td><img src="{{ file.url }}" style="max-width: 100px; max-height: 100px;"></td>
+        {% else %}
+        <td>N/A</td>
+        {% endif %}
+        <td><a href="#" data-file-id="{{ file.id }}" class="btn btn-primary download-btn">Download</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="row">
+    <div class="col-sm-12">
+      <a href="{% url 'download_list' %}" class="btn btn-secondary">View Download List</a>
+    </div>
+  </div>
+</div>
+
+<div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
+  <div id="downloadToast" class="toast" style="position: absolute; top: 0; right: 0;">
+    <div class="toast-header">
+      <strong class="mr-auto">Download Started</strong>
+      <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="toast-body">
+      Your download has started. Click the button below to view your download list.
+    </div>
+    <div class="toast-footer">
+      <a href="{% url 'download_list' %}" class="btn btn-primary" target="_blank">View Download List</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.download-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      var fileId = e.target.getAttribute('data-file-id');
+      var downloadToast = new bootstrap.Toast(document.getElementById('downloadToast'), {delay: 5000});
+      downloadToast.show();
+      await fetch(`download/${fileId}/`, {
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        }
+      })
+      window.location.href = `download/${fileId}/`
+    })
+  })
+</script>
+
+{% endblock %}
