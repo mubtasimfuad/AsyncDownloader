@@ -1,7 +1,7 @@
 
 # AsyncDownloader
 
-AsyncDownloader is a Django web application that allows users to download files asynchronously. It was built using Python 3.9 and Django 3.2.
+AsyncDownloader is a Django web application that allows users to download files asynchronously. It was built using Python 3.10 and Django 4.2.
 
 # Hosting
 
