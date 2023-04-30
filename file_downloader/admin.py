@@ -1,14 +1,9 @@
 from django.contrib import admin
-from .models import File,Download
+from .models import DownloadedFile
 
-class FileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'url', 'created_at')
+class DownloadedFileAdmin(admin.ModelAdmin):
+    list_display = ('name', 'created_at')
     list_filter = ('created_at',)
-    search_fields = ('name', 'url')
+    search_fields = ('name',)
 
-admin.site.register(File, FileAdmin)
-
-@admin.register(Download)
-class DownloadAdmin(admin.ModelAdmin):
-    list_filter = ('downloaded_at',)
-    search_fields = ('file_name',)
+admin.site.register(DownloadedFile, DownloadedFileAdmin)

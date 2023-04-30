@@ -7,29 +7,53 @@
     <thead>
       <tr>
         <th>Name</th>
-        <th>Preview</th>
+        <th>Status</th>
+
         <th>Download</th>
+        
       </tr>
     </thead>
     <tbody>
       {% for file in files %}
       <tr>
         <td>{{ file.name }}</td>
-        {% if file.url|lower|slice:'-4:' == '.png' or file.url|lower|slice:'-4:' == '.jpg' or file.url|lower|slice:'-5:' == '.jpeg' %}
-        <td><img src="{{ file.url }}" style="max-width: 100px; max-height: 100px;"></td>
-        {% else %}
-        <td>N/A</td>
-        {% endif %}
-        <td><a href="#" data-file-id="{{ file.id }}" class="btn btn-primary download-btn">Download</a></td>
+        {% if file.status == 'In progress' %}
+
+        <td>
+
+              <div id="status-{{ file.pk }}"></div>
+              <script>
+                  function updateDownloadStatus{{ file.pk }}() {
+                      $.ajax({
+                          url: "{% url 'download_status' file.pk %}",
+                          success: function(data) {
+                              $("#status-{{ file.pk }}").text(data.status);
+                          }
+                      });
+                  }
+                  setInterval(updateDownloadStatus{{ file.pk }}, 3000);
+              </script>
+                          </td>
+                          <td><a href="#" data-file-id="{{ file.id }}" class="btn btn-primary download-btn disabled">Save</a></td>
+
+
+          {% else %}
+        <td>
+
+              {{ file.status }}
+            </td>
+            <td><a href="#" data-file-id="{{ file.id }}" class="btn btn-primary download-btn">Save</a></td>
+
+
+              {% endif %}
+
+
+        <!-- <td><a href="#" data-file-id="{{ file.id }}" class="btn btn-primary download-btn">Save</a></td> -->
       </tr>
       {% endfor %}
     </tbody>
   </table>
-  <div class="row">
-    <div class="col-sm-12">
-      <a href="{% url 'download_list' %}" class="btn btn-secondary">View Download List</a>
-    </div>
-  </div>
+ 
 </div>
 
 <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
@@ -43,9 +67,7 @@
     <div class="toast-body">
       Your download has started. Click the button below to view your download list.
     </div>
-    <div class="toast-footer">
-      <a href="{% url 'download_list' %}" class="btn btn-primary" target="_blank">View Download List</a>
-    </div>
+   
   </div>
 </div>
 
@@ -56,12 +78,12 @@
       var fileId = e.target.getAttribute('data-file-id');
       var downloadToast = new bootstrap.Toast(document.getElementById('downloadToast'), {delay: 5000});
       downloadToast.show();
-      await fetch(`download/${fileId}/`, {
+      await fetch(`/download_local_file/${fileId}/`, {
         headers: {
           'X-Requested-With': 'XMLHttpRequest'
         }
       })
-      window.location.href = `download/${fileId}/`
+      window.location.href = `/download_local_file/${fileId}/`
     })
   })
 </script>

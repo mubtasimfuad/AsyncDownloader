@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Download File</h1>
+  <form method="post" id="url-form" action="{% url 'download_file_remote' %}">
+    {% csrf_token %}
+    <div class="form-group">
+      <label for="url-input">Enter the URL of the file to download:</label>
+      <input type="text" class="form-control" id="url-input" name="url">
+    </div>
+    <button type="submit" class="btn btn-primary">Download</button>
+  </form>
+  <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
+  <div id="downloadToast" class="toast" style="position: absolute; top: 0; right: 0;">
+    <div class="toast-header">
+      <strong class="mr-auto">Download Started</strong>
+      <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="toast-body">
+      Your download has started. Click the button below to view your download list.
+    </div>
+    <div class="toast-footer">
+      <a href="{% url 'download_list' %}" class="btn btn-primary" target="_blank">View Download List</a>
+    </div>
+  </div>
+</div>
+<div id="downloadSuccessToast" class="toast" style="position: absolute; top: 0; right: 0;">
+  <div class="toast-header">
+    <strong class="mr-auto">Download Completed</strong>
+    <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="toast-body">
+    Your file has been downloaded successfully. You will be redirected to your download list in 10 seconds.
+  </div>
+</div>
+</div>
+
+  {% if messages %}
+  <div class="alert alert-success">
+      {% for message in messages %}
+          {{ message }}
+      {% endfor %}
+  </div>
+{% endif %}
+<script>
+  document.getElementById('url-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    var downloadToast = new bootstrap.Toast(document.getElementById('downloadToast'), {delay: 6000});
+    downloadToast.show();
+    var formData = new FormData(e.target);
+    var response = await fetch('{% url "download_file_remote" %}', {
+      method: 'POST',
+      body: formData
+    });
+    if (response.ok) {
+      var downloadSuccessToast = new bootstrap.Toast(document.getElementById('downloadSuccessToast'), {delay: 5000});
+          downloadSuccessToast.show();
+          setTimeout(() => {
+            window.location.href = "{% url 'download_list' %}";
+          }, 10000);    }
+  });
+</script>
+{% endblock %}
