@@ -17,7 +17,6 @@ import aiofiles
 import aiohttp
 
 @login_required
-
 def file_list(request):
     files = DownloadedFile.objects.filter(user=request.user).order_by('-created_at')
     context = {'files': files}
@@ -27,7 +26,7 @@ def file_list(request):
 
 
 # 
-
+@login_required
 async def download_local_file(request, pk):
     try:
         file = await sync_to_async(DownloadedFile.objects.get)(pk=pk)
@@ -45,6 +44,7 @@ async def download_local_file(request, pk):
         return HttpResponseNotFound()
 
 
+@login_required
 
 def download_status(request, pk):
     download = DownloadedFile.objects.get(pk=pk)
@@ -53,10 +53,12 @@ def download_status(request, pk):
 
 
 
+@login_required
 
 def url_download_page(request):
     return render(request, 'file_downloader/download_from_link.html')
  
+@login_required
 
 async def download_file_remote(request):
     if request.method == "POST":
