@@ -16,7 +16,7 @@ def signup(request):
             raw_password = form.cleaned_data.get('password1')
             user = authenticate(username=user.username, password=raw_password)
             login(request, user)
-            return redirect('file_list')
+            return redirect('download_list')
     else:
         form = SignupForm()
     return render(request, 'signup.html', {'form': form})
@@ -27,7 +27,7 @@ def signin(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            return redirect('file_list')
+            return redirect('download_list')
     else:
         form = AuthenticationForm()
     return render(request, 'login.html', {'form': form})
