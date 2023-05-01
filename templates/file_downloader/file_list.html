@@ -17,7 +17,7 @@
       {% for file in files %}
       <tr>
         <td>{{ file.name }}</td>
-        {% if file.status == 'In progress' %}
+        {% if file.status == 'In progress' or file.status == 'Failed' %}
 
         <td>
 

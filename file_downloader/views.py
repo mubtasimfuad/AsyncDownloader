@@ -26,7 +26,6 @@ def file_list(request):
 
 
 # 
-@login_required
 async def download_local_file(request, pk):
     try:
         file = await sync_to_async(DownloadedFile.objects.get)(pk=pk)
@@ -37,12 +36,11 @@ async def download_local_file(request, pk):
     if os.path.exists(file_path):
         async with aiofiles.open(file_path, mode='rb') as f:
             contents = await f.read()
-            response = HttpResponse(contents, content_type='application/force-download')
-            response['Content-Disposition'] = f'attachment; filename="{file.name}"'
-            return response
+        response = HttpResponse(contents, content_type='application/force-download')
+        response['Content-Disposition'] = f'attachment; filename="{file.name}"'
+        return response
     else:
         return HttpResponseNotFound()
-
 
 @login_required
 
@@ -58,7 +56,6 @@ def download_status(request, pk):
 def url_download_page(request):
     return render(request, 'file_downloader/download_from_link.html')
  
-@login_required
 
 async def download_file_remote(request):
     if request.method == "POST":
