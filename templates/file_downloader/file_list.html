@@ -10,18 +10,19 @@
         <th>Status</th>
 
         <th>Download</th>
-        
+
       </tr>
     </thead>
     <tbody>
       {% for file in files %}
       <tr>
         <td>{{ file.name }}</td>
-        {% if file.status == 'In progress' or file.status == 'Failed' %}
+        {% if file.status == 'In progress' %}
 
         <td>
 
               <div id="status-{{ file.pk }}"></div>
+
               <script>
                   function updateDownloadStatus{{ file.pk }}() {
                       $.ajax({
@@ -33,8 +34,9 @@
                   }
                   setInterval(updateDownloadStatus{{ file.pk }}, 3000);
               </script>
+
                           </td>
-                          <td><a href="#" data-file-id="{{ file.id }}" class="btn btn-primary download-btn disabled">Save</a></td>
+                          <td><a href="#" data-file-id="{{ file.id }}" class="btn btn-primary download-btn disabled">Not available yet</a></td>
 
 
           {% else %}
@@ -42,8 +44,13 @@
 
               {{ file.status }}
             </td>
-            <td><a href="#" data-file-id="{{ file.id }}" class="btn btn-primary download-btn">Save</a></td>
+                    {% if file.status == 'Downloaded' %}
 
+            <td><a href="#" data-file-id="{{ file.id }}" class="btn btn-primary download-btn">Save</a></td>
+          {% else %}
+
+            <td><a href="#" data-file-id="{{ file.id }}" class="btn btn-danger download-btn disabled">Failed</a></td>
+              {% endif %}
 
               {% endif %}
 
@@ -53,7 +60,7 @@
       {% endfor %}
     </tbody>
   </table>
- 
+
 </div>
 
 <div aria-live="polite" aria-atomic="true" style="position: relative; min-height: 200px;">
@@ -65,9 +72,9 @@
       </button>
     </div>
     <div class="toast-body">
-      Your download has started. Click the button below to view your download list.
+      Your download has started.
     </div>
-   
+
   </div>
 </div>
 

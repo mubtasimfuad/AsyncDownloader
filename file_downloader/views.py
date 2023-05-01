@@ -64,7 +64,7 @@ async def download_file_remote(request):
         file_name = os.path.basename(parsed_url.path)
         file_path = os.path.join(settings.MEDIA_ROOT, 'files', file_name)
         user_id = await sync_to_async(lambda: request.user)()
-        
+
         if os.path.exists(file_path):
             name, ext = os.path.splitext(file_name)
             count = 1
@@ -77,26 +77,31 @@ async def download_file_remote(request):
                         name=file_name,
                         content=f"files/{file_name}",
                     )
-        
-        async with aiohttp.ClientSession(trust_env=True) as session:
-            async with session.get(url) as res:
-                if res.status == 200:
-                    content = await res.read()
-                    file_path = os.path.join(settings.MEDIA_ROOT, 'files', file_name)
-                    with open(file_path, 'wb') as f:
-                        f.write(content)
-                    file_obj.status = "Downloaded"
-                    await sync_to_async(file_obj.save)()
-                    return HttpResponse('downloaded file')
 
-                else:
-                    file_obj.status = "Failed"
-                    await sync_to_async(file_obj.save)()
+        try:
+            async with aiohttp.ClientSession(trust_env=True, timeout=aiohttp.ClientTimeout(total=0)) as session:
+                async with session.get(url) as res:
+                    if res.status == 200:
+                        content = await res.read()
+                        file_path = os.path.join(settings.MEDIA_ROOT, 'files', file_name)
+                        with open(file_path, 'wb') as f:
+                            f.write(content)
+                        file_obj.status = "Downloaded"
+                        await sync_to_async(file_obj.save)()
+                        return HttpResponse('downloaded file')
 
-                    return JsonResponse({'error': 'Failed to download file'})
-                    
+                    else:
+                        file_obj.status = "Failed"
+                        await sync_to_async(file_obj.save)()
+
+                        return JsonResponse({'error': 'Failed to download file'})
+
+        except aiohttp.ClientHttpProxyError as exc:
+            file_obj.status = "Failed"
+            await sync_to_async(file_obj.save)()
+            return JsonResponse({'error': f'Failed to download file. {exc}'})
+
     return JsonResponse(status=204)
-
 
 
 
